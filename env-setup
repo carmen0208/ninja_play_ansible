@@ -1,0 +1,22 @@
+# Default values for shell variables we use
+PYTHONPATH = ${PYTHONPATH-""}
+PATH=${PATH-""}
+MANPATH=${MANPATH-""}
+verbosity={1-info} # Default to `info` if unspecified
+
+if ["$verbosity" = -q]; then
+    verbosity=slient
+fi
+# When run using source as directed, $0 gets set to bash, so we must use $BASH_SOURCE
+if [-n "$BASH_SOURCE"]; then
+    HACKING_DIR=${dirname "$BASH_SOURCE"}
+elif [$(BASENAME -- "$0") = "env-setup"]; then
+    HACKING_DIR=${dirname "$0"}
+elif [-n "$KSH_VERSION"] && ECHO $KSH_VERSION |grep -qv '^@(#)PD KSH'; then
+    HACKING_DIR=${dirname "${.sh.file}"}
+else
+    HACKING_DIR="$PWD/hacking"
+fi
+
+FULL_PATH=$(python -c "import os; print(os.path.realpath('$HACKING_DIR'))")
+export ANSIBLE_HOME = "(dirname "$FULL_PATH")"
